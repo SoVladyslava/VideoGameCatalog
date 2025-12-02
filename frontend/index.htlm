@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Онлайн Каталог Відеоігор</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header style="background: #000; padding: 10px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <h1 style="color: white; margin: 0; font-size: 1.2em;">VideoGame Catalog</h1>
+        <div id="auth-container">
+            <button id="login-btn" onclick="openLoginModal()" class="filter-btn">Увійти як Адмін</button>
+            <div id="admin-info" style="display:none; color: white;">
+                Ви увійшли як Адмін
+                <button onclick="logout()" class="reset-btn" style="margin-left: 10px;">Вийти</button>
+            </div>
+        </div>
+    </header>
+
+   <div id="admin-toolbar" class="admin-toolbar" style="display: none;">
+        
+        <div class="admin-group-wrapper">
+            <span class="admin-label">Ігри</span>
+            <div class="admin-group">
+                <button class="filter-btn active" onclick="openAddGameModal()">+ Створити гру</button>
+            </div>
+        </div>
+
+        <div class="admin-group-wrapper">
+            <span class="admin-label">Довідники</span>
+            <div class="admin-group">
+                <button class="filter-btn" onclick="openReferenceModal('category')">Категорії</button>
+                <button class="filter-btn" onclick="openReferenceModal('brand')">Бренди</button>
+                <button class="filter-btn" onclick="openReferenceModal('genre')">Жанри</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="layout-container">
+        <aside class="sidebar">
+            <h2>Категорії</h2>
+            <div id="categories-list" class="filter-group vertical"></div>
+        </aside>
+
+        <main class="main-content">
+            <div class="top-filters">
+                <h3>Бренди</h3>
+                <div id="brands-list" class="filter-group horizontal"></div>
+            </div>
+            <div class="sub-filters">
+                <h3>Жанри</h3>
+                <div id="genres-list" class="filter-group horizontal"></div>
+            </div>
+            <div class="games-header">
+                <h2>Список ігор</h2>
+                <button onclick="resetFilters()" class="reset-btn">Скинути фільтри</button>
+            </div>
+            <div id="games-grid" class="games-grid"></div>
+        </main>
+    </div>
+
+    <div id="login-modal" class="modal">
+        <div class="modal-content" style="width: 300px;">
+            <span class="close-btn" onclick="document.getElementById('login-modal').style.display='none'">&times;</span>
+            <h2>Вхід</h2>
+            <input type="email" id="email-input" placeholder="Email" style="width: 100%; margin-bottom: 10px; padding: 8px;">
+            <input type="password" id="pass-input" placeholder="Пароль" style="width: 100%; margin-bottom: 10px; padding: 8px;">
+            <button onclick="login()" class="filter-btn active" style="width: 100%;">Увійти</button>
+        </div>
+    </div>
+
+    <div id="add-game-modal" class="modal">
+       <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('add-game-modal').style.display='none'">&times;</span>
+            
+            <h2 id="game-modal-title">Додати гру</h2>
+            <input type="hidden" id="game-id">
+
+            <div class="modal-body-scroll">
+                <label style="color:#bb86fc">Назва:</label>
+                <input type="text" id="new-name" placeholder="Назва гри" style="width: 100%; margin-bottom: 10px; padding: 8px; background: #111; color: white; border: 1px solid #555;">
+                
+                <div style="display: flex; gap: 10px;">
+                    <div style="flex:1">
+                        <label style="color:#bb86fc">Ціна:</label>
+                        <input type="number" id="new-price" placeholder="Грн" style="width: 100%; padding: 8px; background: #111; color: white; border: 1px solid #555;">
+                    </div>
+                    <div style="flex:1">
+                        <label style="color:#bb86fc">Рейтинг:</label>
+                        <input type="number" id="new-rating" placeholder="0-5" step="0.1" min="0" max="5" placeholder="5.0" style="width: 100%; padding: 8px; background: #111; color: white; border: 1px solid #555;">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-row-item">
+                        <label style="color:#bb86fc" for="new-brand">Бренд:</label>
+                        <select id="new-brand" class="dark-input">
+                            <option value="">Завантаження...</option>
+                        </select>
+                    </div>
+               
+<!-- 			   <div class="form-group">
+					<label>Категорії (Платформи):</label>
+					<div id="categories-checkbox-list" class="genres-checkbox-container">
+					 Завантаження...
+					</div>
+				</div>-->
+					
+				 <div class="form-row-item">
+                        <label style="color:#bb86fc" for="new-category">Категорія:</label>
+
+                        <select id="new-category" class="dark-input">
+                            <option value="">Завантаження...</option>
+                        </select>
+                    </div>
+                </div> 
+                
+                <div class="form-group">
+                    <label style="color:#bb86fc">Жанри (оберіть декілька):</label>
+                    <div id="genres-checkbox-list" class="genres-checkbox-container">
+                        Завантаження...
+                    </div>
+                </div>
+				
+				
+                <div style="margin-top: 20px; border-top: 1px solid #444; padding-top: 10px;">
+                    <label style="color:#bb86fc; font-weight:bold; display:block; margin-bottom: 10px;">Характеристики:</label>
+                    
+                    <div id="attributes-container"></div>
+
+                    <button onclick="addAttributeRow()" class="filter-btn" style="width: 100%; margin-top: 5px; background-color: #333;">+ Додати характеристику</button>
+                </div>
+
+                <button onclick="saveGame()" class="filter-btn active" style="width: 100%; margin-top: 20px;">Зберегти гру</button>
+            </div>
+        </div> 
+    </div>
+	
+    <div id="game-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+	
+	<div id="reference-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="document.getElementById('reference-modal').style.display='none'">&times;</span>
+            
+            <h2 id="ref-modal-title">Керування</h2>
+            
+            <div style="background: #252525; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+                <label id="ref-input-label" style="display:block; margin-bottom:5px; color:#ccc;">Додати новий елемент:</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="new-ref-name" placeholder="Введіть назву..." style="flex-grow: 1; padding: 10px; border-radius: 4px; border: 1px solid #555; background: #111; color: white;">
+                    <button id="ref-add-btn" onclick="addReferenceItem()" class="filter-btn active">Додати</button>
+                </div>
+            </div>
+
+            <div id="ref-list-container" class="modal-body-scroll">
+                <div id="ref-list">
+                    </div>
+            </div>
+        </div>
+    </div>
+	
+    <script src="script.js"></script>
+</body>
+</html>
+
+
